@@ -6,8 +6,8 @@ GAME RULES:
 - The player can choose to 'Hold', which means that his ROUND score gets added to his GLBAL score. After that, it's the next player's turn
 - The first player to reach 100 points on GLOBAL score wins the game
 */
-let scores, roundScore, activePlayer, gamePlaying;
-
+let scores, roundScore, activePlayer, gamePlaying, limit;
+let last;
 init();
 
 //******roll button********+ */
@@ -21,7 +21,12 @@ document.querySelector(".btn-roll").addEventListener("click", () => {
     /*trick*/
     diceDOM.src = "img/dice-" + dice + ".png";
     // 3: update the round score IF the rolled number was not a 1
-    if (dice !== 1) {
+    if (dice === 6 && last === 6) {
+      // player looses score
+      scores[activePlayer] = 0;
+      document.querySelector("#score-" + activePlayer).textContent = 0;
+      nextPlayer();
+    } else if (dice !== 1) {
       //add score
       roundScore += dice;
       document.querySelector(
@@ -31,6 +36,7 @@ document.querySelector(".btn-roll").addEventListener("click", () => {
       // next player
       nextPlayer();
     }
+    last = dice;
   }
 });
 // ******* hold button *********
@@ -42,7 +48,7 @@ document.querySelector(".btn-hold").addEventListener("click", () => {
     document.querySelector("#score-" + activePlayer).textContent =
       scores[activePlayer];
     // check IF player won the game
-    if (scores[activePlayer] >= 100) {
+    if (scores[activePlayer] >= limit) {
       document.querySelector("#name-" + activePlayer).textContent = "WIN!!";
       // reset dice
       document.querySelector(".dice").style.display = "none";
@@ -62,7 +68,6 @@ document.querySelector(".btn-hold").addEventListener("click", () => {
 
 //*****new button  */
 document.querySelector(".btn-new").addEventListener("click", init);
-
 // next player function
 function nextPlayer() {
   // turn the next player
@@ -96,4 +101,9 @@ function init() {
   document.querySelector(".player-1-panel").classList.remove("winner");
   document.querySelector(".player-0-panel").classList.add("active");
   document.querySelector(".player-1-panel").classList.remove("active");
+  //final score
+  let num = document.getElementById("num");
+  num.addEventListener("keyup", function() {
+    limit = this.value;
+  });
 }
